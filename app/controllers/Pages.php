@@ -12,6 +12,7 @@
                 'title' => 'You Welcomee to Our Website',
 
             ];
+
             
             $this->view('pages/index' , $data );
         }

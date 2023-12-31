@@ -12,26 +12,46 @@
 
     class Database {
         // Params DataBase
-        private $host = DB_HOST;
-        private $user = DB_USER;
-        private $pass = DB_PASS;
-        private $dbname = DB_NAME;
-
         private $dbh;
         private $stmt;
         private $error;
-        public function __construct()
+
+        protected static $_instance;
+
+        private function __construct()
         {   
-            $this->connectDatabase();
+            $this->connect();
             
         }
 
+
+        public static function getInstance(){
+
+            if (is_null(self::$_instance)) {
+
+                self::$_instance = new self();
+            }
+            
+            return self::$_instance;
+
+        }
+
+
+
+
         // Function to Connect With Database 
-        public function connectDatabase() {
+        public function connect() {
+            
+            $db_info = [
+                'host' => DB_HOST,
+                'user' => DB_USER,
+                'pass' => DB_PASS,
+                'dbname' => DB_NAME
+            ];
             // Database Source name
-            $dsn = 'mysql:dbname=' . $this->dbname . ';host=' . $this->host;
+            $dsn = 'mysql:dbname=' . $db_info['dbname'] . ';host=' . $db_info['host'];
             try {
-                $this->dbh = new PDO($dsn , $this->user , $this->pass );
+                $this->dbh = new PDO($dsn , $db_info['user'] , $db_info['pass'] );
                 $this->dbh->setAttribute(PDO::ATTR_ERRMODE , PDO::ERRMODE_EXCEPTION);
                 return $this->dbh;
             } catch (PDOException $e) {
@@ -72,7 +92,7 @@
         }
 
         // Get Result from Database  Return Array Of Object
-        public function manyOjects() {
+        public function manyObjects() {
             $this->execute();
             return $this->stmt->fetchAll(PDO::FETCH_OBJ);
         }
@@ -84,7 +104,7 @@
 
         // Get Number Of Row In the Table 
         public function countRow() {
-            $this->stmt->rowCount();
+            return $this->stmt->rowCount();
         }
 
     }
